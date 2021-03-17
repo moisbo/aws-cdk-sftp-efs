@@ -1,12 +1,52 @@
-# Welcome to your CDK TypeScript Construct Library project!
+# Share Site with AWS Serverless
 
-You should explore the contents of this project. It demonstrates a CDK Construct Library that includes a construct (`AwsCdkSftpS3`)
-which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
+This repository will help you deploy an sftp share site using AWS Elastic Container Service using Fargate Containers with cloudformation
 
-The construct defines an interface (`AwsCdkSftpS3Props`) to configure the visibility timeout of the queue.
+## To get started
 
-## Useful commands
+Install:
+- **aws cli**
 
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
+  https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
+
+- **rsync** (Version 3, Your mac may not have the latest version)
+
+  Upgrade so you can sync config files and repository
+
+#### Run AWS Configure to set up
+
+Run:
+```shell script
+aws configure
+
+```
+Give:
+```shell script
+AWS Access Key ID [None]: <<Get from console>>
+AWS Secret Access Key [None]: <<Get from console>>
+Default region name [None]: ap-southeast-2
+Default output format [None]: json
+```
+
+The `cdk.json` file tells the CDK Toolkit how to execute your app.
+
+## Configuration
+
+#### Base Configuration
+
+- Name your ckd stack in `cdk.json` : `context.cloud_stack_id`
+- Describe your ckd stack in `cdk.json` : `context.base.description`
+
+#### Locations
+
+Locations can be relative to this repository or absolute
+
+- Specify the location of the config: `context.base.config`
+
+#### Generate ssh key
+
+```shell script
+mkdir -p key
+ssh-keygen -f key/id.rsa -t rsa -C "data" -q -N ""
+chmod 644 key/id.rsa
+```
