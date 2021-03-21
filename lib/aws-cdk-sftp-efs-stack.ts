@@ -33,21 +33,6 @@ export class AwsCdkSftpEfsStack extends cdk.Stack {
       }
     };
 
-    const configFileSystem = new efs.FileSystem(this, "config-fs", {
-      vpc,
-      lifecyclePolicy: efs.LifecyclePolicy.AFTER_14_DAYS,
-      performanceMode: efs.PerformanceMode.GENERAL_PURPOSE,
-      throughputMode: efs.ThroughputMode.BURSTING
-    });
-    new cdk.CfnOutput(this, 'configFileSystemId', {value: configFileSystem.fileSystemId});
-
-    const configVolumeConfig = {
-      name: "config-vol",
-      efsVolumeConfiguration: {
-        fileSystemId: configFileSystem.fileSystemId,
-      }
-    };
-
     const cluster = new ecs.Cluster(this, "share-cluster", {
       vpc: vpc
     });
@@ -55,14 +40,13 @@ export class AwsCdkSftpEfsStack extends cdk.Stack {
     const logging = new ecs.AwsLogDriver({streamPrefix: "share", logRetention: logs.RetentionDays.ONE_MONTH})
 
     const dataIngest = new DataIngest(this, "data-ingest-task-definition", {
-      volumes: [dataVolumeConfig, configVolumeConfig],
+      volumes: [dataVolumeConfig],
       memoryLimitMiB: base["data_service"]["memory"],
       cpu: base["data_service"]["cpu"]
     }, {
       logging,
       base,
-      dataVolumeConfig,
-      configVolumeConfig
+      dataVolumeConfig
     });
 
     const sshSecurityGroup = new ec2.SecurityGroup(this, 'ssh-security-group', {
@@ -110,8 +94,6 @@ export class AwsCdkSftpEfsStack extends cdk.Stack {
     sshApp.connections.allowTo(sshSecurityGroup, ec2.Port.tcp(2222));
     sshApp.connections.allowFrom(dataFileSystem, ec2.Port.tcp(2049));
     sshApp.connections.allowTo(dataFileSystem, ec2.Port.tcp(2049));
-    sshApp.connections.allowFrom(configFileSystem, ec2.Port.tcp(2049));
-    sshApp.connections.allowTo(configFileSystem, ec2.Port.tcp(2049));
 
   }
 }

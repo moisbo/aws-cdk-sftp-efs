@@ -16,6 +16,9 @@
       "ssh": {
         "location": "docker/ssh",
         "public_key": "key/id.rsa.pub",
+        "user_name": "data",
+        "passwordfile": "key/passwordfile",
+        "password_access": "true",
         "memory": 256,
         "cpu": 1
       }

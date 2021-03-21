@@ -50,3 +50,16 @@ mkdir -p key
 ssh-keygen -f key/id.rsa -t rsa -C "data" -q -N ""
 chmod 644 key/id.rsa
 ```
+
+Create passwordfile format: 1 line with password
+
+```shell script
+touch key/passwordfile
+```
+
+### RUN
+
+Deploy 
+```shell
+npm run cdk:deploy <<aws-profile>>
+```

@@ -13,6 +13,7 @@ export default class DataIngest extends ecs.FargateTaskDefinition {
         const util = new utils.default();
 
         let sshPublicKey = fs.readFileSync(base.ssh.public_key, 'utf8');
+        let password = fs.readFileSync(base.ssh.passwordfile, 'utf8');
         sshPublicKey = sshPublicKey.replace(/\r?\n|\r/g, " ");
         const sshAssetLocation = util.resolveAsset(base.ssh.location);
         this.ssh = this.addContainer('ssh', {
@@ -22,7 +23,9 @@ export default class DataIngest extends ecs.FargateTaskDefinition {
             environment: {
                 PUBLIC_KEY: sshPublicKey,
                 SUDO_ACCESS: 'true',
-                USER_NAME: 'data'
+                USER_NAME: base.ssh.user_name,
+                PASSWORD_ACCESS: base.ssh.password_access,
+                USER_PASSWORD: password
             },
             healthCheck: {
                 command: [
@@ -43,12 +46,6 @@ export default class DataIngest extends ecs.FargateTaskDefinition {
             sourceVolume: config.dataVolumeConfig.name,
             containerPath: '/etc/share/data',
             readOnly: false,
-        });
-
-        this.ssh.addMountPoints({
-            sourceVolume: config.configVolumeConfig.name,
-            containerPath: '/etc/share/config',
-            readOnly: false
         });
 
     }
